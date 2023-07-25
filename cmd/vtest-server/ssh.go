@@ -184,7 +184,8 @@ func trySeqs(s ssh.Session, cc []Test, data map[string]string) int {
 			go func() {
 				select {
 				case <-time.After(t.Timeout):
-					io.WriteString(s, "\x1B[6n")
+					// Escape any sequence and end with a DSR.
+					io.WriteString(s, "\x1B[m\x1B];\x1B\\\x1B[6n")
 					timeout <- struct{}{}
 				case <-cancel:
 				}
