@@ -33,8 +33,12 @@ func sshServer() {
 				n := trySeqs(s, basicTests, data)
 				io.WriteString(s, "[-] Got "+fmt.Sprintf("%d", n)+" replies\n")
 				log.Printf("%#v", data)
-				if _, ok := data["XTVERSION"]; ok {
-					io.WriteString(s, fmt.Sprintf("[-] XTVERSION=%q\n", strings.TrimSuffix(data["XTVERSION"][4:], "\x1b\\")))
+				if version, ok := data["XTVERSION"]; ok {
+					version = strings.TrimSuffix(strings.TrimPrefix(version, "\x1BP>|"), "\x1B\\")
+					io.WriteString(s, fmt.Sprintf("[-] XTVERSION=%q\n", version))
+				}
+				if _, ok := data["DECRQCRA"]; ok {
+					io.WriteString(s, fmt.Sprintf("[\x1B[33m!\x1B[m] Warning, your terminal replied to DECRQCRA -- this can be a security risk (see XXX)\n"))
 				}
 				io.WriteString(s, fmt.Sprintf("[?] debug, present this better later... %#v\n", data))
 
@@ -200,7 +204,7 @@ func trySeqs(s ssh.Session, cc []Test, data map[string]string) int {
 			cancel <- struct{}{}
 		}
 		log.Printf("%q %v", seq, timedOut)
-		if !timedOut {
+		if !timedOut || (len(seq) > 0 && seq[len(seq)-1] != 'R') {
 			data[t.Name] = string(seq)
 			count++
 		}
