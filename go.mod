@@ -1,4 +1,4 @@
-module github.com/dgl/term-sec-test
+module github.com/dgl/vt-houdini
 
 go 1.18
 
