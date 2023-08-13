@@ -3,13 +3,25 @@ package main
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import (
+	"flag"
 	"fmt"
+	"os"
 	"runtime/debug"
 	"strings"
 )
 
+var listenFlag = flag.String("listen", ":2222", "Listen address for SSH service")
+var versionFlag = flag.Bool("v", false, "Display version")
+
 func main() {
-	sshServer()
+	flag.Parse()
+
+	if *versionFlag {
+		fmt.Println(versionString())
+		os.Exit(0)
+	}
+
+	sshServer(*listenFlag)
 }
 
 func versionString() string {
@@ -31,11 +43,10 @@ func versionString() string {
 	// This is a condition of the AGPL license, if you run a modified version you
 	// must make the changes available. The simple way to do that is fork the
 	// repo below on GitHub, push your changes to it and update the repo URL.
-	const repo = "https://github.com/dgl/term-sec-test"
+	const repo = "https://github.com/dgl/vt-houdini"
 
 	buf := &strings.Builder{}
-	fmt.Fprintf(buf, "UNRELEASED \x1b[9m") // XXX: unreleased
-	fmt.Fprintf(buf, "term-sec-test is AGPL licensed.\n")
+	fmt.Fprintf(buf, "vt-houdini is AGPL licensed.\n")
 	if commit != "" {
 		commitURL := fmt.Sprintf("%v/commit/%v", repo, commit)
 		prettyURL := fmt.Sprintf("%v/commit/%v", repo, commit[:7])
@@ -44,6 +55,5 @@ func versionString() string {
 	if modified {
 		fmt.Fprintf(buf, "    \x1b[31mThis version is modified!\x1b[0m\n    To comply with the license please build from a pushed git commit and alter\n    the URL in the source (main.go) if needed.\n\n")
 	}
-	fmt.Fprintf(buf, "\x1b[0m") // XXX: unreleased
 	return buf.String()
 }

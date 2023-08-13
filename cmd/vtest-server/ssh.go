@@ -12,7 +12,7 @@ import (
 	"github.com/gliderlabs/ssh"
 )
 
-func sshServer() {
+func sshServer(listen string) {
 	ssh.Handle(func(s ssh.Session) {
 		ptyReq, winCh, isPty := s.Pty()
 		if isPty {
@@ -66,8 +66,8 @@ func sshServer() {
 		}
 	})
 
-	log.Println("Starting ssh server on port 2222...")
-	log.Fatal(ssh.ListenAndServe(":2222", nil, ssh.HostKeyFile("host_key")))
+	log.Printf("Starting ssh server on %s...", listen)
+	log.Fatal(ssh.ListenAndServe(listen, nil, ssh.HostKeyFile("host_key")))
 }
 
 func parseANSISeq(s ssh.Session) []byte {
@@ -171,7 +171,6 @@ var cveTests = []Test{
 	{"CVE-2022-46387", "\x1b]0;\rtouch /tmp/cve-2022-46387\r\a\x1b[21t", DefaultTimeout, "cve-2022-46387\r"},
 	// iterm2 DECRQSS
 	{"CVE-2022-45872", "\x1bP$q;touch /tmp/cve-2022-45872\n\x1b\\\n\x1bP$qm\x1b\\", DefaultTimeout, "cve-2022-45872\n"},
-	// kitty file XXX
 
 	// XXX: Hack, consider doing this as part of trySeqs?
 	// Catch late replies.
