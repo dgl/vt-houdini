@@ -47,6 +47,8 @@ func versionString() string {
 
 	buf := &strings.Builder{}
 	fmt.Fprintf(buf, "vt-houdini is AGPL licensed.\n")
+	fmt.Fprintf(buf, "\x1B[31mADVERT: If you've found this on the DEF CON network...\ncongrats -- this is intentionally open! Be nice.\nCome to my talk: https://forum.defcon.org/node/245741\x1B[0m\n\n")
+
 	if commit != "" {
 		commitURL := fmt.Sprintf("%v/commit/%v", repo, commit)
 		prettyURL := fmt.Sprintf("%v/commit/%v", repo, commit[:7])
