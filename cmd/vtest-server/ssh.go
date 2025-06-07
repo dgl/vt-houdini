@@ -37,10 +37,10 @@ func sshServer(listen string) {
 					version = strings.TrimSuffix(strings.TrimPrefix(version, "\x1BP>|"), "\x1B\\")
 					io.WriteString(s, fmt.Sprintf("[-] XTVERSION=%q\n", version))
 				}
-				if _, ok := data["DECRQCRA"]; ok {
-					io.WriteString(s, fmt.Sprintf("[\x1B[33m!\x1B[m] Warning, your terminal replied to DECRQCRA -- this can be a security risk (see XXX)\n"))
+				if _, ok := data["DECRQCRA"]; ok && !strings.Contains(data["DECRQCRA"], "0000") {
+					io.WriteString(s, fmt.Sprintf("[\x1B[33m!\x1B[m] Warning, your terminal replied to DECRQCRA -- this can be a security risk (see https://dgl.cx/term#cursor-checksum)\n"))
 				}
-				io.WriteString(s, fmt.Sprintf("[?] debug, present this better later... %#v\n", data))
+				io.WriteString(s, fmt.Sprintf("[?] \x1B[38;5;248mDebug -- all responses: %#v\x1B[m\n", data))
 
 				io.WriteString(s, "[\x1b[1;32m*\x1b[0m] Now testing for security issues; please \x1b[34mwait\x1b[0m (and don't touch anything)...\n")
 				n = trySeqs(s, cveTests, data)
@@ -148,7 +148,7 @@ var basicTests = []Test{
 	{"DA", "\x1b[c", DefaultTimeout, ""},
 	{"DA2", "\x1b[>c", DefaultTimeout, ""},
 	{"DA3", "\x1b[=c", DefaultTimeout, ""},
-	{"DECRQCRA", "\x1b[0;0;0;1;0;1*y", DefaultTimeout, ""},
+	{"DECRQCRA", "\x1b[s\x1b[HX\x1b[1;1;1;1;1;1*y\x1b[u", DefaultTimeout, ""},
 	{"XTVERSION", "\x1b[>q", DefaultTimeout, ""},
 	{"TITLE", "\x1b[21t", DefaultTimeout, ""},
 	{"DECRQSS_SGR", "\x1bP$qm\x1b\\", DefaultTimeout, ""},
